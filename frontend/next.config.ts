@@ -1,15 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // Allow the frontend to call the Python backend during dev
-  async rewrites() {
-    return [
-      {
-        source: "/api/agents/:path*",
-        destination: `${process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://localhost:9000"}/agents/:path*`,
-      },
-    ];
-  },
+  // Agent requests go through app/api/agents/[...path]/route.ts (server-side proxy).
+  // That route adds the X-Site-Token header and forwards to the private Railway URL.
+  // No rewrites needed — the API route handles /api/agents/* directly.
 };
 
 export default nextConfig;
