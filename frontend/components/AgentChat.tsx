@@ -11,6 +11,36 @@ interface Props {
   onSend: (text: string) => void;
   placeholder?: string;
   initialMessage?: string;
+  suggestedPrompts?: string[];
+}
+
+const toolLabels: Record<string, string> = {
+  create_task:  "Creating task",
+  update_task:  "Updating task",
+  delete_task:  "Removing task",
+  list_tasks:   "Reading board",
+  fetch_url:    "Fetching page",
+  current_time: "Checking time",
+  web_search:   "Searching web",
+};
+
+function friendlyToolName(name: string | undefined): string {
+  if (!name) return "Working…";
+  return toolLabels[name] ?? name.replace(/_/g, " ");
+}
+
+/** Cycles ● → ●● → ●●● every 400ms */
+function ThinkingDots() {
+  const [count, setCount] = useState(1);
+  useEffect(() => {
+    const id = setInterval(() => setCount((c) => (c % 3) + 1), 400);
+    return () => clearInterval(id);
+  }, []);
+  return (
+    <span className="text-[#6e6e73] tracking-widest">
+      {"●".repeat(count)}
+    </span>
+  );
 }
 
 export default function AgentChat({
@@ -21,6 +51,7 @@ export default function AgentChat({
   onSend,
   placeholder = "Type a message...",
   initialMessage,
+  suggestedPrompts = [],
 }: Props) {
   const [input, setInput] = useState("");
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -62,31 +93,23 @@ export default function AgentChat({
                     : "bg-white border border-[#e5e5ea] text-[#1d1d1f] rounded-tl-sm shadow-sm"
                 }`}
               >
-                {m.content || (isStreaming ? <span className="animate-pulse text-[#6e6e73]">●●●</span> : "")}
+                {/* Show cycling dots while waiting for content, actual text once it arrives */}
+                {m.content || (isStreaming && m.role === "assistant" ? <ThinkingDots /> : null)}
               </div>
             </div>
           ))}
 
-          {/* Tool call activity */}
+          {/* Tool call activity — friendly labels only, no raw IDs or args */}
           {toolCalls.length > 0 && (
-            <div className="space-y-1.5">
-              {toolCalls.map((t) => (
-                <div
-                  key={t.id}
-                  className="text-xs font-mono bg-white border border-[#e5e5ea] rounded-xl px-3 py-2 text-[#6e6e73] shadow-sm"
+            <div className="flex flex-wrap gap-1.5">
+              {toolCalls.map((t, i) => (
+                <span
+                  key={t.id ?? i}
+                  className="inline-flex items-center gap-1 text-xs bg-white border border-[#e5e5ea] rounded-full px-2.5 py-1 text-[#6e6e73] shadow-sm"
                 >
-                  <span className="text-purple-500 font-medium">⚙ {t.name}</span>
-                  {t.args && (
-                    <span className="ml-2 text-[#6e6e73]">
-                      {t.args.length > 60 ? t.args.slice(0, 60) + "…" : t.args}
-                    </span>
-                  )}
-                  {t.result && (
-                    <div className="mt-1 text-green-600">
-                      ↳ {t.result.length > 80 ? t.result.slice(0, 80) + "…" : t.result}
-                    </div>
-                  )}
-                </div>
+                  <span className="text-purple-400">⚙</span>
+                  {friendlyToolName(t.name)}
+                </span>
               ))}
             </div>
           )}
@@ -102,9 +125,28 @@ export default function AgentChat({
         </div>
       </div>
 
-      {/* Input — also constrained + centered */}
+      {/* Input + suggested prompts — single bottom bar */}
       <div className="border-t border-[#e5e5ea] bg-white px-4 py-3">
-        <div className="max-w-2xl mx-auto flex gap-2">
+        <div className="max-w-2xl mx-auto space-y-2">
+
+          {/* Suggested prompts — vertical list, only before first message */}
+          {messages.length === 0 && suggestedPrompts.length > 0 && (
+            <div className="space-y-0.5">
+              {suggestedPrompts.map((prompt) => (
+                <button
+                  key={prompt}
+                  onClick={() => onSend(prompt)}
+                  disabled={isStreaming}
+                  className="w-full text-left text-xs px-3 py-1.5 rounded-lg text-[#6e6e73] hover:text-[#1d1d1f] hover:bg-[#f5f5f7] transition-all duration-150 disabled:opacity-40 flex items-center justify-between gap-2 group"
+                >
+                  <span className="truncate">{prompt}</span>
+                  <span className="shrink-0 text-[#c7c7cc] group-hover:text-[#6e6e73] transition-colors">→</span>
+                </button>
+              ))}
+            </div>
+          )}
+
+        <div className="flex gap-2">
           <input
             value={input}
             onChange={(e) => setInput(e.target.value)}
@@ -120,6 +162,8 @@ export default function AgentChat({
           >
             {isStreaming ? "…" : "Send"}
           </button>
+        </div>
+
         </div>
       </div>
     </div>

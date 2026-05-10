@@ -42,6 +42,10 @@ export function useAgentStream({ agentPath, onStateSnapshot }: UseAgentStreamOpt
   const [isStreaming, setIsStreaming] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const threadId = useRef(crypto.randomUUID());
+  // AG-UI state is owned by the frontend — the backend is stateless per request.
+  // We track the latest STATE_SNAPSHOT here and send it back on every subsequent request
+  // so the agent has access to the current task list (or any other shared state).
+  const agentState = useRef<unknown>(null);
 
   const sendMessage = useCallback(
     async (userText: string) => {
@@ -80,8 +84,9 @@ export function useAgentStream({ agentPath, onStateSnapshot }: UseAgentStreamOpt
               role: m.role,
               content: m.content,
             })),
-            // Required fields in the AG-UI RunAgentInput schema
-            state: null,
+            // Send the latest state snapshot back so the backend can restore it.
+            // AG-UI is stateless per request — the frontend owns the state.
+            state: agentState.current,
             tools: [],
             context: [],
             forwardedProps: {},
@@ -157,6 +162,8 @@ export function useAgentStream({ agentPath, onStateSnapshot }: UseAgentStreamOpt
                 )
               );
             } else if (type === "STATE_SNAPSHOT") {
+              // Store state so it's sent back on the next request
+              agentState.current = event.snapshot;
               onStateSnapshot?.(event.snapshot);
             } else if (type === "RUN_ERROR") {
               setError((event.message as string) ?? "Agent error");
@@ -165,10 +172,16 @@ export function useAgentStream({ agentPath, onStateSnapshot }: UseAgentStreamOpt
         }
       } catch (err) {
         setError(err instanceof Error ? err.message : "Unknown error");
-        // Remove the empty assistant placeholder on error
         setMessages((prev) => prev.filter((m) => m.id !== assistantId));
       } finally {
         setIsStreaming(false);
+        // Remove the assistant placeholder if no text arrived (e.g. tool-only response)
+        setMessages((prev) => {
+          const msg = prev.find((m) => m.id === assistantId);
+          return msg && !msg.content.trim()
+            ? prev.filter((m) => m.id !== assistantId)
+            : prev;
+        });
       }
     },
     [agentPath, isStreaming, messages, onStateSnapshot]
@@ -179,6 +192,7 @@ export function useAgentStream({ agentPath, onStateSnapshot }: UseAgentStreamOpt
     setToolCalls([]);
     setError(null);
     threadId.current = crypto.randomUUID();
+    agentState.current = null;
   }, []);
 
   return { messages, toolCalls, isStreaming, error, sendMessage, clearMessages };

@@ -69,7 +69,7 @@ export default function TaskList({ tasks }: { tasks: Task[] }) {
                         <span className={`text-xs px-1.5 py-0.5 rounded-md ${statusBadge[task.status]}`}>
                           {statusLabel[task.status]}
                         </span>
-                        {task.due_date && (
+                        {task.due_date && !["null","none","undefined"].includes(task.due_date.toLowerCase()) && (
                           <span className="text-xs text-[#6e6e73]">Due {task.due_date}</span>
                         )}
                       </div>

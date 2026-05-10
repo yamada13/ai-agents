@@ -19,8 +19,14 @@ MODEL = os.getenv("DEFAULT_MODEL", "anthropic:claude-sonnet-4-6")
 agent = Agent(
     MODEL,
     name="pydantic",
-    instructions="""You are a helpful AI assistant. You have access to tools for
-getting the current time and fetching information from URLs. Be concise and accurate.""",
+    instructions="""You are a helpful AI assistant with two tools:
+- current_time(timezone): use this for ANY question about the current time or date. \
+Pass the IANA timezone string (e.g. 'Asia/Kolkata' for India, 'America/New_York' for New York, \
+'Asia/Tokyo' for Japan). Never fetch external URLs to get the time.
+- fetch_url(url): use this to read web pages when the user asks about a specific URL or \
+wants information from the web.
+
+Be concise and accurate.""",
 )
 
 

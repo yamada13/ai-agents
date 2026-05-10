@@ -18,10 +18,31 @@ const previewAccent: Record<string, string> = {
   orange: "text-orange-600",
 };
 
+const rowHoverBg: Record<string, string> = {
+  blue:   "hover:bg-blue-50/40",
+  green:  "hover:bg-green-50/40",
+  purple: "hover:bg-purple-50/40",
+  orange: "hover:bg-orange-50/40",
+};
+
+const accentBar: Record<string, string> = {
+  blue:   "bg-blue-400",
+  green:  "bg-green-400",
+  purple: "bg-purple-400",
+  orange: "bg-orange-400",
+};
+
+const accentIndex: Record<string, string> = {
+  blue:   "group-hover:text-blue-500",
+  green:  "group-hover:text-green-500",
+  purple: "group-hover:text-purple-500",
+  orange: "group-hover:text-orange-500",
+};
+
 function AgentPreview({ agent }: { agent: AgentConfig }) {
   return (
     <div className={`w-72 rounded-2xl border bg-gradient-to-br p-6 ${previewGradients[agent.color]}`}>
-      <div className="text-4xl mb-4">{agent.icon}</div>
+      <div className="text-4xl mb-4 leading-none flex items-center">{agent.icon}</div>
       <p className={`text-xs font-mono font-medium mb-2 ${previewAccent[agent.color]}`}>
         {String(AGENTS.indexOf(agent) + 1).padStart(2, "0")}
       </p>
@@ -61,8 +82,9 @@ export default function Home() {
           I build and publish AI agents.
         </h1>
         <p className="text-sm text-[#6e6e73] leading-relaxed max-w-sm">
-          Learning in public — exploring Pydantic AI, AG-UI, and what it means
-          to put real agents in front of real people.
+          Self-taught, experiment-driven. I pick a concept, build something real
+          with it, and post it here — so you can see exactly what these agents
+          do and how they work.
         </p>
       </div>
 
@@ -75,19 +97,25 @@ export default function Home() {
               href={agent.path}
               onMouseEnter={() => setHovered(agent.id)}
               onMouseLeave={() => setHovered(null)}
-              className="group flex items-center justify-between py-6 border-b border-[#e5e5ea] transition-colors hover:bg-transparent"
+              className={`group relative flex items-center justify-between py-6 border-b border-[#e5e5ea] transition-colors pl-4 ${rowHoverBg[agent.color]}`}
             >
+              {/* Left accent bar — grows from center on hover */}
+              <span
+                className={`absolute left-0 top-3 bottom-3 w-0.5 rounded-full origin-center scale-y-0 group-hover:scale-y-100 transition-transform duration-200 ${accentBar[agent.color]}`}
+              />
+
               <div className="flex items-center gap-6">
-                {/* Index number */}
-                <span className="text-xs font-mono text-[#c7c7cc] w-5 shrink-0">
+                {/* Index number — picks up accent color on hover */}
+                <span className={`text-xs font-mono text-[#c7c7cc] w-5 shrink-0 transition-colors duration-200 ${accentIndex[agent.color]}`}>
                   {String(i + 1).padStart(2, "0")}
                 </span>
 
                 {/* Text */}
                 <div>
-                  <p className="text-base font-medium text-[#1d1d1f] group-hover:text-black transition-colors">
-                    {agent.icon} {agent.name}
-                  </p>
+                  <div className="flex items-center gap-2">
+                    <span className="text-base leading-none">{agent.icon}</span>
+                    <span className="text-base font-medium text-[#1d1d1f] group-hover:text-black transition-colors">{agent.name}</span>
+                  </div>
                   <p className="text-sm text-[#6e6e73] mt-0.5">{agent.description.split("—")[0].trim()}</p>
                 </div>
               </div>

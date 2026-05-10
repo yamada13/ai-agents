@@ -19,7 +19,7 @@ export const AGENTS: AgentConfig[] = [
     path: "/agents/pydantic",
     backendPath: "/agents/pydantic",
     color: "blue",
-    icon: "🤖",
+    icon: "⚡",
   },
   {
     id: "crawler",
@@ -41,7 +41,7 @@ export const AGENTS: AgentConfig[] = [
     path: "/agents/harness",
     backendPath: "/agents/harness",
     color: "purple",
-    icon: "⚙️",
+    icon: "🧪",
   },
   {
     id: "productivity",
@@ -52,7 +52,7 @@ export const AGENTS: AgentConfig[] = [
     path: "/agents/productivity",
     backendPath: "/agents/productivity",
     color: "orange",
-    icon: "✅",
+    icon: "📡",
   },
 ];
 

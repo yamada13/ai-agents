@@ -48,7 +48,7 @@ export default function AgentPageShell({ agent, children }: Props) {
           ← back
         </Link>
         <span className="text-[#e5e5ea]">|</span>
-        <span className="text-xl">{agent.icon}</span>
+        <span className="text-xl leading-none flex items-center">{agent.icon}</span>
         <div className="flex-1 min-w-0">
           <h1 className="font-semibold text-[#1d1d1f] text-sm">{agent.name}</h1>
           <p className="text-xs text-[#6e6e73] truncate">{agent.description}</p>

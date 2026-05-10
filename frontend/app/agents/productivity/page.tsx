@@ -6,8 +6,10 @@ import AgentChat from "@/components/AgentChat";
 import TaskList from "@/components/TaskList";
 import { useAgentStream } from "@/hooks/useAgentStream";
 import { AGENTS } from "@/lib/agents";
+import { AGENT_CONTENT } from "@/lib/agentContent";
 
 const agent = AGENTS.find((a) => a.id === "productivity")!;
+const prompts = AGENT_CONTENT.productivity.prompts.map((p) => p.text);;
 
 interface TaskListState {
   tasks: {
@@ -58,6 +60,7 @@ export default function ProductivityAgentPage() {
             isStreaming={isStreaming}
             error={error}
             onSend={sendMessage}
+            suggestedPrompts={prompts}
             placeholder="e.g. 'Add a high-priority task to review the Q2 report by Friday'"
             initialMessage="I'm your AI task manager! Create, update, or delete tasks by chatting — the board on the left updates live. Try: 'Add a high-priority task to review the Q2 report by Friday'"
           />

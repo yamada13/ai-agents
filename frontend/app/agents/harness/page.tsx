@@ -4,8 +4,10 @@ import AgentPageShell from "@/components/AgentPageShell";
 import AgentChat from "@/components/AgentChat";
 import { useAgentStream } from "@/hooks/useAgentStream";
 import { AGENTS } from "@/lib/agents";
+import { AGENT_CONTENT } from "@/lib/agentContent";
 
 const agent = AGENTS.find((a) => a.id === "harness")!;
+const prompts = AGENT_CONTENT.harness.prompts.map((p) => p.text);;
 
 export default function HarnessAgentPage() {
   const { messages, toolCalls, isStreaming, error, sendMessage } = useAgentStream({
@@ -20,6 +22,7 @@ export default function HarnessAgentPage() {
         isStreaming={isStreaming}
         error={error}
         onSend={sendMessage}
+        suggestedPrompts={prompts}
         placeholder="Ask me to compute something — e.g. 'Calculate the first 15 fibonacci numbers'"
         initialMessage="I can write and execute Python to answer your questions. Try: 'Calculate the first 15 fibonacci numbers' or 'What is 17 to the power of 13?'"
       />
