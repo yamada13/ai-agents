@@ -1,0 +1,33 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+.env
+dist/
+build/
+*.egg
+
+# uv
+backend/.venv/
+
+# Node
+node_modules/
+frontend/.next/
+frontend/out/
+frontend/.vercel/
+.pnpm-debug.log*
+
+# Env files (never commit)
+.env
+.env.local
+.env.*.local
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.idea/
+.vscode/
+*.swp

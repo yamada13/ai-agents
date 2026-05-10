@@ -1,0 +1,29 @@
+[project]
+name = "agents-backend"
+version = "0.1.0"
+description = "Pydantic AI agents backend — pydantic, crawler, harness, productivity"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.115.0,<0.136.0",
+    "starlette>=0.41.0,<1.0.0",
+    "uvicorn[standard]>=0.32.0",
+    # Pydantic AI core + AG-UI + model providers
+    "pydantic-ai-slim[ag-ui,anthropic,openai]>=1.0.0",
+    # Harness: CodeMode + ToolSearch
+    "pydantic-ai-harness[code-mode]>=0.1.0",
+    # Crawler agent: HTTP + HTML parsing
+    "httpx>=0.27.0",
+    "beautifulsoup4>=4.12.0",
+    # Optional: richer crawling — set FIRECRAWL_API_KEY to enable
+    "firecrawl-py>=1.5.0",
+    # Utilities
+    "python-dotenv>=1.0.0",
+    "pydantic>=2.9.0",
+]
+
+[tool.uv]
+package = false
+dev-dependencies = [
+    "ruff>=0.6.0",
+    "pyright>=1.1.0",
+]
